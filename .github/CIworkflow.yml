@@ -1,4 +1,4 @@
-name: Continous Integration with GitHub actions workflow
+name: Continous Integration with GitHub actions workflow with single job
 
 on: push
 
