@@ -1,0 +1,36 @@
+name: Continous Integration with GitHub actions workflow
+
+on: push
+
+jobs: 
+  integration:
+    runs-on: ubuntu-latest
+    steps:
+      - name: checkout code to Runner machine
+        uses: actions/checkout@v3
+
+      - name: setup java on Runner machine
+        uses: actions/setup-java@v3
+        with:
+          version: '21'
+          distribution: 'temurin'
+
+      - name: build jar into target folder in Runner machine
+        run: mvn clean package
+
+      - name: configure aws credentials for Runner machine for programatic access
+        uses: aws-actions/configure-aws-actions@v2
+        with:
+          aws-access-key: ${{ secrets.AWS_ACCESS_KEY }}
+          aws-secret-access-key: ${{ secrets.AWS_ACCESS_KEY }}
+          aws-region: 
+
+      - name: Docker engine in Runner machine logs into ECR repo
+        uses: aws-actions/amazon-ecr-login@v2
+
+      - name: Docker engine builds Image on Runner machine and pushes to ECR repo
+        uses: docker/build-push-action@v3
+        with:
+          context: .
+          push: true
+          tags:
